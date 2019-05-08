@@ -1,4 +1,4 @@
-**CPTC_Pylogger**
+# CPTC_Pylogger
 
 CPTC_Pylogger is a Proof of Concept Event-Monitoring keylogger.
 It utilizes SetWindowsHookEx Windows API function to setup a global hook to the threads,
